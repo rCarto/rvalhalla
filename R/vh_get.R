@@ -12,16 +12,16 @@
 #' * "expansion": Returns a geojson representation of a graph traversal at a given location.
 #' * "locate": Provides detailed metadata about the nodes and edges in the graph.
 #' * "status": Returns information about the running server or Valhalla instance.
-#' * "centroid": Finds the least cost convergence point of routes from multiple locations. 
+#' * "centroid": Finds the least cost convergence point of routes from multiple locations.
 #' @param ... Additional parameters to pass to the Valhalla API.
 #' @return An sf object representing the optimized route.
 #' @export
 vh_get = function(url = "http://localhost:8002", resource = "route", params = list(), ...) {
   resource = match_resource(resource)
-  json = httr2::request(url) |> 
-    httr2::req_url_path_append(resource) |> 
-    httr2::req_body_json(params) |> 
-    httr2::req_perform() |> 
+  json = httr2::request(url) |>
+    httr2::req_url_path_append(resource) |>
+    httr2::req_body_json(params) |>
+    httr2::req_perform() |>
     httr2::resp_body_json()
   json
 }
@@ -35,7 +35,7 @@ vh_sfc = function(json) {
 }
 
 #' Get route from Valhalla API
-#' 
+#'
 #' @param from A numeric vector of length 2, specifying the longitude and latitude of the starting point.
 #' @param to A numeric vector of length 2, specifying the longitude and latitude of the destination.
 #' @param costing A string specifying the costing model to use for route optimization. Default is "auto".
@@ -68,7 +68,8 @@ vh_route = function(
     ...
     )
   json = vh_get(from, to, costing, units, url = url, params = params, resource = "route")
-  vh_sfc(json$trip$legs[[1]]$shape)
+  # vh_sfc(json$trip$legs[[1]]$shape)
+  return(round(c(duration = json$trip$summary$time/60, distance = json$trip$summary$length), 2))
 }
 
 vh_resources = function() {
